@@ -1,6 +1,9 @@
 <script lang="ts">
     import { Handle, Position, useConnection, type NodeProps } from '@xyflow/svelte';
+    import { marked } from 'marked';
   
+    
+
     type $$Props = NodeProps;
 
     export let dragHandle: $$Props['dragHandle'] = undefined; dragHandle;
@@ -27,7 +30,7 @@
     $: isConnecting = !!$connection.startHandle?.nodeId;
     $: isTarget = !!$connection.startHandle && $connection.startHandle?.nodeId !== id;
   
-    $: label = data.label;
+    $: label = marked(data.label);
   </script>
   
   <div class="customNode">
@@ -49,7 +52,7 @@
         type="target"
         isConnectableStart={false}
       />
-      {label}
+      {@html label}
     </div>
   </div>
   

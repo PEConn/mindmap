@@ -9,7 +9,9 @@ const fallbackNodeWidth = 172;
 // TODO: Make the layout take into account the node height.
 
 function width(node: Node): number {
-    return node.computed?.width ?? fallbackNodeWidth
+    const w = node.computed?.width ?? fallbackNodeWidth;
+    console.log("Width: " + w);
+    return w;
 }
 
 function height(node: Node): number {

@@ -28,6 +28,11 @@ export function executeCommand(
         return;
     }
 
+    if (command.startsWith("layout ")) {
+        const layout = command.substring("layout ".length);
+        onLayout(layout);
+    }
+
     if (command === "reset" || command === "clear") {
         nodes.set([]);
         edges.set([]);
@@ -224,7 +229,15 @@ function serializeToClipboard(nodes: Node[], edges: Edge[]) {
         return `link ${edge.source} ${edge.target} ${l}`;
     }).join("\n");
 
-    const contents = nodePart + "\n" + edgePart;
+    const colorsPart = nodes.flatMap(node => {
+        if (node.data.colors) {
+            return [`color ${node.id} ${node.data.color}`]
+        } else {
+            return [];
+        }
+    }).join("\n")
+
+    const contents = nodePart + "\n" + edgePart + "\n" + colorsPart;
     navigator.clipboard.writeText(contents)
         .then(
             () => console.log("Saved to clipboard"),

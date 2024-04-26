@@ -61,13 +61,15 @@
 
   let layout = "none";
 
-  function onLayout(onNewElement = false) {
-    if (layout === "flow") {
+  function onLayout(override = "", onNewElement = false) {
+    const l = override === "" ? layout : override;
+
+    if (l === "flow") {
       const layout = layoutElements($nodes, $edges);
 
       $nodes = layout.nodes;
       $edges = layout.edges;
-    } else if (layout === "force") {
+    } else if (l === "force") {
       startLayout(nodes, edges, onNewElement);
     }
   }

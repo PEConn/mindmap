@@ -32,7 +32,7 @@ export function startLayout(
             }
         }
 
-        const size = node.computed.width;
+        const size = node.computed.width / 2;
         return {
             x: node.position.x,
             y: node.position.y,
@@ -57,9 +57,10 @@ export function startLayout(
     console.log("Running simulation");
     simulation = d3
         .forceSimulation(simulationNodes)
-        .force("charge", d3.forceManyBody().distanceMax(300))
+        .force("charge", d3.forceManyBody().distanceMax(250))
         .force("collide", d3.forceCollide(node => node.size))
-        .force("link", d3.forceLink(simulatedEdges).distance(200))
+        .force("center", d3.forceCenter())
+        .force("link", d3.forceLink(simulatedEdges).distance(140))
         .on("tick", () => {
             console.log("Tick");
             nodes.set(simulationNodes.map(node => {

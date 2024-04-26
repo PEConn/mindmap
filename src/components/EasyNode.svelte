@@ -57,6 +57,12 @@
   </div>
   
   <style>
+    :global(code) {
+      color: darkgreen;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
     .customNodeBody {
         padding: 10px;
         border: solid black 1px;

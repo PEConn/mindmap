@@ -16,16 +16,27 @@
     export let targetPosition: $$Props['targetPosition'] = undefined; targetPosition;
     export let sourcePosition: $$Props['sourcePosition'] = undefined; sourcePosition;
 
-    export let data: { label: String, id: String };
+    export let data: {
+        label: String,
+        id: String,
+        color?: String,
+    };
+
+    $: {
+        console.log(data.color);
+    }
+
+    $: cssVariables = data.color !== undefined ? `--bg-color: ${data.color}` : "";
 </script>
    
-<div class="customNode">
-    <Handle type="target" position={Position.Top} />
+<div style="{cssVariables}" class="customNode">
+    
     <span>{data.id}</span>
     <div>
         {data.label}
     </div>
     <Handle type="source" position={Position.Bottom} />
+    <Handle type="target" position={Position.Bottom} />
 </div>
 
 <style>
@@ -35,7 +46,7 @@
         border-radius: 4px;
         font-size: 12px;
         max-width: 150px;
-        background: white;
+        background: var(--bg-color, white);
     }
 
     .customNode span {

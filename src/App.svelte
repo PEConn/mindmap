@@ -18,6 +18,8 @@
   import FloatingEdge from './components/FloatingEdge.svelte';
   import { executeCommand } from './lib/commands';
   import { layoutElements } from './lib/dagre';
+  import { startLayout, stopLayout } from './lib/d3-layout';
+    import CustomNode from './components/CustomNode.svelte';
 
   let command = "";
 
@@ -27,12 +29,13 @@
 
     event.preventDefault();
     executeCommand(command, nodes, edges, onLayout);
+
     command = "";
   }
 
   // https://svelteflow.dev/examples/nodes/easy-connect
   const nodeTypes = {
-    'custom': EasyNode
+    'custom': CustomNode
   }
 
   const edgeTypes = {
@@ -56,15 +59,23 @@
   const edges = writable<Edge[]>(JSON.parse(localStorage.getItem("edges") ?? "[]"));
   edges.subscribe((value) => localStorage.setItem("edges", JSON.stringify(value)));
 
-  function onLayout() {
-    const layout = layoutElements($nodes, $edges);
+  let layout = "none";
 
-    $nodes = layout.nodes;
-    $edges = layout.edges;
+  function onLayout(onNewElement = false) {
+    if (layout === "flow") {
+      const layout = layoutElements($nodes, $edges);
+
+      $nodes = layout.nodes;
+      $edges = layout.edges;
+    } else if (layout === "force") {
+      startLayout(nodes, edges, onNewElement);
+    }
   }
 </script>
 
-<div style:height="100vh">
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div style:height="100vh" on:click={stopLayout}>
   <SvelteFlow
       {nodes} {edges}
       {nodeTypes} {edgeTypes}
@@ -77,6 +88,11 @@
     <MiniMap position="top-right" />
     <div class="command-palette">
       <textarea bind:value={command} on:keydown={onCommandKeydown}/>
+      <select bind:value={layout}>
+        <option>none</option>
+        <option>flow</option>
+        <option>force</option>
+      </select>
     </div>
   </SvelteFlow>
 </div>

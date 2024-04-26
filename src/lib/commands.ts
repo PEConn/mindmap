@@ -37,13 +37,56 @@ export function executeCommand(
         serializeToClipboard(get(nodes), get(edges));
     }
 
+    // Command: "col" for column.
+    // It moves the most recently placed node right a column and to
+    // the top.
+    if (command === "col") {
+        const ns = get(nodes);
+        if (ns.length === 0) return;
+
+        const x = Math.max(...ns.map(n => n.position.x)) + 200;
+        const y = Math.min(...ns.map(n => n.position.y));
+        nodes.update(ns => {
+            ns[ns.length - 1].position = {x, y};
+            return ns;
+        })
+    }
+
+    // Command: color <id> <color>
+    if (command.startsWith("color ")) {
+        const parts = command.split(" ");
+        if (parts.length !== 3) {
+            console.log(`Malformed command: ${parts}`);
+            return;
+        }
+
+        const id = parts[1];
+        const color = parts[2];
+
+        nodes.update(ns => {
+            return ns.map(n => {
+                // TODO: Make a note of this!!
+                // n.data.color = "blue" didn't trigger an update
+                // but n.data = {...n.data, color: blue} did.
+                if (n.id === id) {
+                    n.data = {
+                        ...n.data,
+                        color: color,
+                    }
+                }
+
+                return n;
+            })
+        })
+    }
+
     // Command: add <all the text here>
     if (command.startsWith("add ")) {
         const label = command.substring(4);
         const id = getNextId(get(nodes)).toString();
 
         addNode(nodes, id, label);
-        onLayout();
+        onLayout(true);
     }
 
     // TODO: Make this be add-with-id without an overlap with the command above.
@@ -58,7 +101,7 @@ export function executeCommand(
         const id = parts[1];
         const label = parts.slice(2).join(" ");
         addNode(nodes, id, label);
-        onLayout();
+        onLayout(true);
     }
 
     if (command === "ll") {
@@ -113,20 +156,32 @@ function addNode(
         id: string,
         label: string) {
 
-    nodes.update((n: Node[]) => {
+    nodes.update((ns: Node[]) => {
+        // Make the node start off on top of the last one.
+        // This means that nodes aren't just put in the center of the screen and
+        // slowly pushing everything else outwards.
+        let x = 0;
+        let y = 0;
+
+        if (ns.length > 0) {
+            const lastNode = ns[ns.length - 1];
+            x = lastNode.position.x;
+            y = lastNode.position.y + 100;
+        }
+
         const newNode = {
             id,
             data: {
                 label: label,
-                id
+                id,
             },
-            position: { x: 0, y: 0 },
+            position: { x, y },
             type: 'custom'
         }
 
-        n.push(newNode);
+        ns.push(newNode);
 
-        return n;
+        return ns;
     });
 }
 

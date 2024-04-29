@@ -43,6 +43,7 @@
       saveFile();
     } else {
       runCommand(command);
+      
       if (autoSave && command !== "reset" && command !== "clear") {
         saveFile();
       }
@@ -102,8 +103,16 @@
       const file = await fileHandle.getFile();
       const contents = await file.text();
 
+      // TODO: Make this not so ugly...
+      // We don't want to autosave while we're loading.
+      // TODO: We need a batch command mode.
+      const autoSaveBefore = autoSave;
+      autoSave = false;
+
       runCommand("clear");
       contents.split("\n").forEach(line => runCommand(line));
+      
+      autoSave = autoSaveBefore;
       log = "Loaded.";
     } catch (error) {
       console.log(error);

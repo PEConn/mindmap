@@ -111,7 +111,7 @@
 
       runCommand("clear");
       contents.split("\n").forEach(line => runCommand(line));
-      
+
       autoSave = autoSaveBefore;
       log = "Loaded.";
     } catch (error) {
@@ -162,6 +162,7 @@
       {defaultEdgeOptions}
       connectionLineType={ConnectionLineType.Straight}
       {connectionLineStyle}
+      panOnDrag={[1]} selectionMode="full" selectionOnDrag
       fitView>
     <Controls position="top-left" />
     <Background />

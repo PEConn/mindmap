@@ -122,6 +122,58 @@ export function executeCommand(
         onLayout(true);
     }
 
+    // TODO: Combine all the commands that involve modifying nodes.
+
+    // Command: append <id> <text>
+    if (command.startsWith("append ")) {
+        const parts = command.split(" ");
+        if (parts.length < 3) {
+            console.log("append needs at least 3 elements.");
+            return;
+        }
+
+        const id = parts[1];
+        const content = parts.slice(2).join(" ");
+
+        nodes.update(ns => {
+            return ns.map(n => {
+                if (n.id === id) {
+                    n.data = {
+                        ...n.data,
+                        label: n.data.label + "\n" + content
+                    }
+                }
+
+                return n;
+            })
+        })
+    }
+
+    // Command: edit <id> <text>
+    if (command.startsWith("edit ")) {
+        const parts = command.split(" ");
+        if (parts.length < 3) {
+            console.log("append needs at least 3 elements.");
+            return;
+        }
+
+        const id = parts[1];
+        const content = parts.slice(2).join(" ");
+
+        nodes.update(ns => {
+            return ns.map(n => {
+                if (n.id === id) {
+                    n.data = {
+                        ...n.data,
+                        label: content
+                    }
+                }
+
+                return n;
+            })
+        })
+    }
+
     // Command: move <id> <x> <y>
     if (command.startsWith("move ")) {
         const parts = command.split(" ");

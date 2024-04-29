@@ -122,6 +122,34 @@ export function executeCommand(
         onLayout(true);
     }
 
+    // Command: move <id> <x> <y>
+    if (command.startsWith("move ")) {
+        const parts = command.split(" ");
+        if (parts.length !== 4) {
+            console.log("move requires 4 parts");
+            return;
+        }
+
+        const id = parts[1];
+        const x = parseInt(parts[2]);
+        const y = parseInt(parts[3]);
+
+        if (isNaN(x) || isNaN(y)) {
+            console.log(`Could not parse ${x} or ${y}`);
+            return;
+        }
+
+        nodes.update(ns => {
+            return ns.map(n => {
+                if (n.id === id) {
+                    n.position = { x, y }
+                }
+
+                return n;
+            })
+        })
+    }
+
     if (command === "ll") {
         // ll = "link last", links the last two added nodes.
         const n = get(nodes);
@@ -238,10 +266,13 @@ function serializeToClipboard(nodes: Node[], edges: Edge[]) {
 }
 
 export function serialize(nodes: Node[], edges: Edge[]): string {
-    const nodePart = nodes.map(node => {
+    const nodePart = nodes.flatMap(node => {
         // Input: node = { id, data { label } }
         // Output: add-with-id id label
-        return `awi ${node.id} ${node.data.label}`
+        return [
+            `awi ${node.id} ${node.data.label}`,
+            `move ${node.id} ${node.position.x} ${node.position.y}`
+        ]
     }).join("\n");
     const edgePart = edges.map(edge => {
         // Input: edge = { id, source, target, label? }

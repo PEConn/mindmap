@@ -282,7 +282,6 @@ export function serialize(nodes: Node[], edges: Edge[]): string {
     }).join("\n");
 
     const colorsPart = nodes.flatMap(node => {
-        console.log(node.data.color);
         if (node.data.color) {
             return [`color ${node.id} ${node.data.color}`]
         } else {

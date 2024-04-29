@@ -16,16 +16,14 @@
     export let dragging: $$Props['dragging']; dragging;
     export let targetPosition: $$Props['targetPosition'] = undefined; targetPosition;
     export let sourcePosition: $$Props['sourcePosition'] = undefined; sourcePosition;
+    export let positionAbsoluteX: $$Props['positionAbsoluteX'] = undefined; positionAbsoluteX;
+    export let positionAbsoluteY: $$Props['positionAbsoluteY'] = undefined; positionAbsoluteY;
 
     export let data: {
         label: string,
         id: string,
         color?: string,
     };
-
-    $: {
-        console.log(data.color);
-    }
 
     $: cssVariables = data.color !== undefined ? `--bg-color: ${data.color}` : "";
 

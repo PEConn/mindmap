@@ -217,6 +217,14 @@ function getNextId(nodes: Node[]) {
 }
 
 function serializeToClipboard(nodes: Node[], edges: Edge[]) {
+    const contents = serialize(nodes, edges);
+    navigator.clipboard.writeText(contents)
+        .then(
+            () => console.log("Saved to clipboard"),
+            err => console.log(err));
+}
+
+export function serialize(nodes: Node[], edges: Edge[]): string {
     const nodePart = nodes.map(node => {
         // Input: node = { id, data { label } }
         // Output: add-with-id id label
@@ -237,9 +245,5 @@ function serializeToClipboard(nodes: Node[], edges: Edge[]) {
         }
     }).join("\n")
 
-    const contents = nodePart + "\n" + edgePart + "\n" + colorsPart;
-    navigator.clipboard.writeText(contents)
-        .then(
-            () => console.log("Saved to clipboard"),
-            err => console.log(err));
+    return nodePart + "\n" + edgePart + "\n" + colorsPart;
 }

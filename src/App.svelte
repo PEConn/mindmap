@@ -16,19 +16,38 @@
 
   import EasyNode from './components/EasyNode.svelte';
   import FloatingEdge from './components/FloatingEdge.svelte';
-  import { executeCommand } from './lib/commands';
+  import { executeCommand, serialize } from './lib/commands';
   import { layoutElements } from './lib/dagre';
   import { startLayout, stopLayout } from './lib/d3-layout';
     import CustomNode from './components/CustomNode.svelte';
 
   let command = "";
+  let log = "";
+  let autoSave = false;
+
+  $: { console.log(autoSave); }
+
+  function runCommand(command: string) {
+    executeCommand(command, nodes, edges, onLayout);
+  }
 
   function onCommandKeydown(event: KeyboardEvent) {
     if (event.shiftKey) return;
     if (event.key !== "Enter") return;
+    log = "";
 
     event.preventDefault();
-    executeCommand(command, nodes, edges, onLayout);
+
+    if (command == "load") {
+      loadFile();
+    } else if (command == "save") {
+      saveFile();
+    } else {
+      runCommand(command);
+      if (autoSave) {
+        saveFile();
+      }
+    }
 
     command = "";
   }
@@ -73,6 +92,57 @@
       startLayout(nodes, edges, onNewElement);
     }
   }
+
+  // TODO: Move these into another file (or commands).
+  async function loadFile() {
+    log = "Loading...";
+    
+    try {
+      const [fileHandle] = await window.showOpenFilePicker();
+
+      const file = await fileHandle.getFile();
+      const contents = await file.text();
+
+      runCommand("clear");
+      contents.split("\n").forEach(line => runCommand(line));
+      log = "Loaded.";
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+    
+  }
+
+  let handle: any = null;
+
+  async function getFileHandle(): Promise<FileSystemFileHandle | null> {
+    const options = {
+      types: [{
+        description: 'Text Files',
+        accept: { 'text/plain': ['.txt'] }
+      }]
+    };
+    try {
+      return await window.showSaveFilePicker(options);
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  async function saveFile() {
+    log = "Saving...";
+    if (handle == null) {
+      handle = await getFileHandle();
+      if (handle == null) return;
+    }
+
+    // TODO: Check for the permission expiring...
+    const writable = await handle.createWritable();
+    await writable.write(serialize($nodes, $edges));
+    await writable.close();
+    log = "Saved";
+  }
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -90,11 +160,15 @@
     <MiniMap position="top-right" />
     <div class="command-palette">
       <textarea bind:value={command} on:keydown={onCommandKeydown}/>
+      <button on:click={loadFile}>Load file</button>
+      <button on:click={saveFile}>Save</button>
+      <label><input type="checkbox" bind:checked={autoSave}/>Auto save?</label>
       <select bind:value={layout}>
         <option>none</option>
         <option>flow</option>
         <option>force</option>
       </select>
+      <span>{log}</span>
     </div>
   </SvelteFlow>
 </div>

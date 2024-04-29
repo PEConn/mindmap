@@ -10,7 +10,6 @@ const fallbackNodeWidth = 172;
 
 function width(node: Node): number {
     const w = node.computed?.width ?? fallbackNodeWidth;
-    console.log("Width: " + w);
     return w;
 }
 

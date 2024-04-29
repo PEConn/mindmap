@@ -1,6 +1,15 @@
 import { type Writable, get } from 'svelte/store';
 import { type Node, type Edge } from '@xyflow/svelte';
 
+const QUICK_COLORS = new Map();
+QUICK_COLORS.set("r", "#e6b8af");
+QUICK_COLORS.set("o", "#fce5cd");
+QUICK_COLORS.set("y", "#fff2cc");
+QUICK_COLORS.set("g", "#d9ead3");
+QUICK_COLORS.set("b", "#c9daf8");
+QUICK_COLORS.set("i", "#d9d2e9");
+QUICK_COLORS.set("v", "#ead1dc");
+
 export function executeCommand(
     command: string,
     nodes: Writable<Node[]>,
@@ -66,7 +75,11 @@ export function executeCommand(
         }
 
         const id = parts[1];
-        const color = parts[2];
+        let color = parts[2];
+
+        if (QUICK_COLORS.has(color)) {
+            color = QUICK_COLORS.get(color);
+        }
 
         nodes.update(ns => {
             return ns.map(n => {
@@ -238,7 +251,8 @@ export function serialize(nodes: Node[], edges: Edge[]): string {
     }).join("\n");
 
     const colorsPart = nodes.flatMap(node => {
-        if (node.data.colors) {
+        console.log(node.data.color);
+        if (node.data.color) {
             return [`color ${node.id} ${node.data.color}`]
         } else {
             return [];

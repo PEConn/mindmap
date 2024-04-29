@@ -25,8 +25,6 @@
   let log = "";
   let autoSave = false;
 
-  $: { console.log(autoSave); }
-
   function runCommand(command: string) {
     executeCommand(command, nodes, edges, onLayout);
   }
@@ -40,11 +38,12 @@
 
     if (command == "load") {
       loadFile();
+      autoSave = true;
     } else if (command == "save") {
       saveFile();
     } else {
       runCommand(command);
-      if (autoSave) {
+      if (autoSave && command !== "reset" && command !== "clear") {
         saveFile();
       }
     }

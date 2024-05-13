@@ -47,6 +47,10 @@
       if (autoSave && command !== "reset" && command !== "clear") {
         saveFile();
       }
+
+      if (command === "reset" || command === "clear") {
+        handle = null;
+      }
     }
 
     command = "";
@@ -168,6 +172,7 @@
     <Background />
     <MiniMap position="top-right" />
     <div class="command-palette">
+      <!-- TODO: Emoji picker: https://github.com/missive/emoji-mart/issues/904 -->
       <textarea bind:value={command} on:keydown={onCommandKeydown}/>
       <button on:click={loadFile}>Load file</button>
       <button on:click={saveFile}>Save</button>

@@ -23,6 +23,7 @@
         label: string,
         id: string,
         color?: string,
+        decoration?: string
     };
 
     $: cssVariables = data.color !== undefined ? `--bg-color: ${data.color}` : "";
@@ -32,7 +33,7 @@
     $: label = marked(data.label);
 </script>
    
-<div style="{cssVariables}" class="customNode">
+<div style="{cssVariables}" class="customNode crossed">
     
     <span>{data.id}</span>
     <div>
@@ -76,5 +77,12 @@
     :global(div.customHandle2) {
         width: 10px;
         height: 10px;
+    }
+
+    :global(.crossed) {
+        background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 10 10'> <path d='M0 0 L0 10 L10 10' fill='red' /></svg>");
+        background-repeat:no-repeat;
+        background-position:center center;
+        background-size: 100% 100%, auto;
     }
 </style>

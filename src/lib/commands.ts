@@ -221,7 +221,7 @@ export function executeCommand(
     if (command.startsWith("link ")) {
         const parts = command.split(" ");
         if (parts.length < 3) {
-            console.log("Could not parse" + parts);
+            console.log("Could not parse " + parts);
             return;
         }
         const source = parts[1];
@@ -234,6 +234,22 @@ export function executeCommand(
 
         addEdge(edges, source, target, label);
         onLayout();
+    }
+
+    // Command: unlink <source> <target>
+    if (command.startsWith("unlink ")) {
+        const parts = command.split(" ");
+        if (parts.length < 3) {
+            console.log("Could not parse " + parts);
+            return;
+        }
+
+        const source = parts[1];
+        const target = parts[2];
+
+        edges.update(es => es.filter(e => {
+            return !(e.target === target && e.source === source);
+        }));
     }
 
     if (command.startsWith("remove ")) {
